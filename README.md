@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="https://bohemian-day-clock.vercel.app"><b>Open in your browser</b></a> ·
-  <a href="https://github.com/carbongo/bohemian-day-clock/releases/latest"><b>Download for macOS, Windows, Linux</b></a> ·
+  <a href="https://github.com/carbongo/bohemian-day-clock/releases/latest"><b>Download for macOS</b></a> ·
   <a href="#install"><b>Homebrew</b></a>
 </p>
 
@@ -33,16 +33,15 @@ A normal clock tells you the time. This one shows where you are in the day: how 
 - **Your city by default**, picked from your timezone; choose another in Settings (`S`). The choice is remembered.
 - **Hand-drawn in SVG**: every ring, star and glow is code, so it is sharp at any size.
 - **Works offline**: one self-contained HTML file, no server, no tracking, no network calls.
-- **Desktop apps** for macOS (universal), Windows and Linux, around 10 MB each.
+- **Desktop app** for macOS (universal), around 12 MB; Windows and Linux build from source.
 
 ## Install
 
-| Platform | How                                                                                                                                                   |
-| -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Browser  | [bohemian-day-clock.vercel.app](https://bohemian-day-clock.vercel.app), or download `…_web.html` from a release and open it.                          |
-| macOS    | `brew install --cask carbongo/tap/bohemian-day-clock`, or the `.dmg` from [Releases](https://github.com/carbongo/bohemian-day-clock/releases/latest). |
-| Windows  | `.msi` from [Releases](https://github.com/carbongo/bohemian-day-clock/releases/latest).                                                               |
-| Linux    | `.deb` or `.AppImage` from [Releases](https://github.com/carbongo/bohemian-day-clock/releases/latest).                                                |
+| Platform       | How                                                                                                                                                   |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Browser        | [bohemian-day-clock.vercel.app](https://bohemian-day-clock.vercel.app), or download `…_web.html` from a release and open it.                          |
+| macOS          | `brew install --cask carbongo/tap/bohemian-day-clock`, or the `.dmg` from [Releases](https://github.com/carbongo/bohemian-day-clock/releases/latest). |
+| Windows, Linux | `npm run desktop` ([build from source](#build-from-source)).                                                                                          |
 
 The macOS app is not notarised. Homebrew handles that; with the `.dmg`, open the app once, then allow it in System Settings → Privacy & Security → **Open Anyway**.
 

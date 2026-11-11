@@ -12,7 +12,7 @@ Bohemian Day Clock: a custom-drawn 24-hour daylight clock. React + TypeScript + 
 
 ## Docs
 
-| Doc                                  | Covers                                                  |
-| ------------------------------------ | ------------------------------------------------------- |
-| [architecture](docs/architecture.md) | Runtime flow, module map, code constraints.             |
-| [desktop](docs/desktop.md)           | Pake packaging, icons, release workflow, Homebrew cask. |
+| Doc                                  | Covers                                               |
+| ------------------------------------ | ---------------------------------------------------- |
+| [architecture](docs/architecture.md) | Runtime flow, module map, code constraints.          |
+| [desktop](docs/desktop.md)           | Pake packaging, icons, release steps, Homebrew cask. |

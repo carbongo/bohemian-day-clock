@@ -13,9 +13,18 @@
 
 ## Release
 
+Built and published from a Mac; CI builds no packages. Windows and Linux packages are not published.
+
 1. Bump `version` in `package.json`, commit, push `master`.
-2. `git tag v<version> && git push origin v<version>`: `.github/workflows/release.yml` builds all three OSes and publishes a GitHub Release with the packages, the single-file `…_web.html` and `SHA256SUMS.txt`.
-3. Homebrew: in `carbongo/homebrew-tap`, set `version` and `sha256` (from `SHA256SUMS.txt`, the `.dmg` line) in `Casks/bohemian-day-clock.rb`; push `main`.
+2. `npm run desktop`, then:
+   ```sh
+   v=$(node -p "require('./package.json').version")
+   cp public/index.html "release/Bohemian-Day-Clock_${v}_web.html"
+   (cd release && shasum -a 256 *.dmg *.html > SHA256SUMS.txt)
+   git tag "v$v" && git push origin "v$v"
+   gh release create "v$v" release/* --title "v$v" --generate-notes
+   ```
+3. Homebrew: in `carbongo/homebrew-tap`, set `version` and `sha256` (the `.dmg` line of `SHA256SUMS.txt`) in `Casks/bohemian-day-clock.rb`; push `main`.
 
 - The web build deploys to Vercel (`bohemian-day-clock.vercel.app`) from `master`.
 - macOS builds are not notarised (no Developer ID): the cask clears quarantine; a direct `.dmg` download needs System Settings → Privacy & Security → Open Anyway after the first launch.
