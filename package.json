@@ -1,13 +1,15 @@
 {
   "name": "bohemian-day-clock",
-  "version": "2.0.1",
-  "description": "Custom-drawn 24-hour daylight clock",
+  "version": "2.1.0",
+  "description": "Your whole day on one turning dial: daylight, night, sunrise and sunset for your city.",
   "private": true,
   "source": "src/index.html",
   "scripts": {
     "start": "parcel src/index.html --port 8000",
     "build": "parcel build src/index.html --dist-dir public --public-url ./ --no-source-maps && node scripts/inline-output.mjs public/index.html",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "desktop:package": "node scripts/desktop.mjs",
+    "desktop": "npm run build && npm run desktop:package"
   },
   "targets": {
     "default": {
@@ -22,19 +24,19 @@
   "license": "ISC",
   "keywords": [
     "clock",
-    "medieval",
+    "24-hour-clock",
+    "sunrise",
+    "sunset",
     "daylight",
-    "astronomical",
-    "html",
-    "typescript",
+    "desktop-app",
+    "pake",
     "react",
-    "tailwind",
-    "parcel"
+    "tailwind"
   ],
   "bugs": {
     "url": "https://github.com/carbongo/bohemian-day-clock/issues"
   },
-  "homepage": "https://github.com/carbongo/bohemian-day-clock#readme",
+  "homepage": "https://bohemian-day-clock.vercel.app",
   "dependencies": {
     "react": "^19.2.6",
     "react-dom": "^19.2.6"

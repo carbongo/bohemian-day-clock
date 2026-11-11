@@ -165,3 +165,10 @@ $RECYCLE.BIN/
 
 # Photoshop files
 *.psd
+
+# Desktop packages
+release/
+*.dmg
+*.msi
+*.deb
+*.AppImage
