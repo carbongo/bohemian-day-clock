@@ -1,6 +1,6 @@
 {
   "name": "bohemian-day-clock",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Your whole day on one turning dial: daylight, night, sunrise and sunset for your city.",
   "private": true,
   "source": "src/index.html",
