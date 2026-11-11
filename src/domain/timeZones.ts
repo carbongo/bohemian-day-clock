@@ -292,6 +292,23 @@ export function getTimeZoneCities() {
   ];
 }
 
+export function getCitySlug(city: TimeZoneCity) {
+  return city.label
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+/** The city a shared link names, by slug ("kutna-hora") or IANA timezone. */
+export function findCityByLinkValue(value: string) {
+  const wanted = value.trim().toLowerCase();
+
+  return getTimeZoneCities().find(
+    (city) =>
+      getCitySlug(city) === wanted || city.timeZone.toLowerCase() === wanted,
+  );
+}
+
 export function isKnownTimeZoneCity(timeZone: string) {
   return timeZone === getResolvedTimeZone() || timeZone in TIME_ZONE_CITIES;
 }
@@ -304,7 +321,9 @@ function getCurrentTimeZoneCity(
   return {
     ...city,
     label:
-      city.timeZone === timeZone ? city.label : getCityLabelFromTimeZone(timeZone),
+      city.timeZone === timeZone
+        ? city.label
+        : getCityLabelFromTimeZone(timeZone),
     timeZone,
   };
 }

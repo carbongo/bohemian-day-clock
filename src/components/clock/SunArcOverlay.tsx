@@ -16,9 +16,10 @@ interface SunArcOverlayProps {
 }
 
 const glowClassName =
-  "fill-none stroke-amber-300/100 stroke-[190] [stroke-linecap:round]";
+  "fill-none stroke-[#fbd45c] stroke-[190] [stroke-linecap:round]";
 const coreClassName =
-  "fill-none stroke-amber-100/100 stroke-[42] [stroke-linecap:round]";
+  "fill-none stroke-[#f3a01f]/90 stroke-[170] [stroke-linecap:round]";
+const HEART_ARC_RATIO = 0.42;
 const markerCircleClassName = "fill-none stroke-amber-200/95 stroke-[2]";
 
 const MIN_CORE_ARC_MINUTES = 60;
@@ -38,8 +39,16 @@ export function SunArcOverlay({ sunWindow }: SunArcOverlayProps) {
 
   const corePath =
     sunWindow.status === "normal"
-      ? getZenithArcPath(sunWindow.sunriseMinutes, sunWindow.sunsetMinutes)
+      ? getZenithArcPath(sunWindow.sunriseMinutes, sunWindow.sunsetMinutes, 1)
       : getClockArcPath(540, 900);
+  const heartPath =
+    sunWindow.status === "normal"
+      ? getZenithArcPath(
+          sunWindow.sunriseMinutes,
+          sunWindow.sunsetMinutes,
+          HEART_ARC_RATIO,
+        )
+      : getClockArcPath(660, 780);
   const markerHours =
     sunWindow.status === "normal"
       ? getRoundedSunEventHours(
@@ -58,7 +67,7 @@ export function SunArcOverlay({ sunWindow }: SunArcOverlayProps) {
         <g clipPath={`url(#${plasterClipPathId})`}>
           <g filter={`url(#${softArcFilterId})`}>
             <path className={glowClassName} d={corePath} />
-            <path className={coreClassName} d={corePath} />
+            <path className={coreClassName} d={heartPath} />
           </g>
         </g>
       </ClockSvg>
@@ -107,10 +116,14 @@ function SunEventHourMarkers({
   );
 }
 
-function getZenithArcPath(startMinutes: number, endMinutes: number) {
+function getZenithArcPath(
+  startMinutes: number,
+  endMinutes: number,
+  ratio: number,
+) {
   const daylightMinutes = normalizeMinutes(endMinutes - startMinutes);
   const solarNoonMinutes = normalizeMinutes(startMinutes + daylightMinutes / 2);
-  const coreArcMinutes = getCoreArcMinutes(daylightMinutes);
+  const coreArcMinutes = getCoreArcMinutes(daylightMinutes) * ratio;
 
   return getClockArcPath(
     solarNoonMinutes - coreArcMinutes / 2,

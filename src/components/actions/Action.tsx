@@ -1,50 +1,54 @@
 import { useEffect } from "react";
 import type { ReactNode } from "react";
 
-import { ACTION_CONTROL_CLASS_NAME, ActionButton } from "./ActionButton";
-import { ActionMenu } from "./ActionMenu";
 import { ActionShortcutKey } from "./ActionShortcutKey";
 
 interface BaseActionProps {
   label: ReactNode;
+  /** A `KeyboardEvent.key` value: "s", "Enter", "ArrowUp". */
+  shortcutKey: string;
 }
 
 interface ActionLinkProps extends BaseActionProps {
   href: string;
-  shortcutKey?: string;
 }
 
-interface ActionMenuProps extends BaseActionProps {
-  children: ReactNode;
-  isOpen: boolean;
-  menuId: string;
-  shortcutKey?: string;
-  onClick: () => void;
+interface ActionButtonProps extends BaseActionProps {
+  /** For a prompt that opens a panel: whether it is open, and its id. */
+  controls?: string;
+  isOpen?: boolean;
+  onPress: () => void;
 }
 
-export type ActionProps = ActionLinkProps | ActionMenuProps;
+export type ActionProps = ActionLinkProps | ActionButtonProps;
 
+const ACTION_CLASS_NAME =
+  "group flex cursor-pointer items-center justify-end gap-3 rounded-sm px-2 py-1 font-dial text-base text-vellum transition [text-shadow:0_1px_3px_rgb(0_0_0/0.9)] hover:text-white focus-visible:outline-2 focus-visible:outline-gilt md:text-xl";
+const KEY_LABELS: Record<string, string> = {
+  arrowdown: "↓",
+  arrowleft: "←",
+  arrowright: "→",
+  arrowup: "↑",
+  enter: "↵",
+  escape: "Esc",
+};
+
+/** A key prompt: what a key does, with its keycap. Also a button to tap. */
 export function Action(props: ActionProps) {
   const href = "href" in props ? props.href : undefined;
-  const onClick = "onClick" in props ? props.onClick : undefined;
-  const { shortcutKey } = props;
-  const shortcutLabel = props.shortcutKey?.toUpperCase();
+  const onPress = "onPress" in props ? props.onPress : undefined;
+  const shortcutKey = props.shortcutKey.toLowerCase();
+  const shortcutLabel = KEY_LABELS[shortcutKey] ?? shortcutKey.toUpperCase();
 
   useEffect(() => {
-    if (!shortcutKey) {
-      return;
-    }
-
-    const normalizedShortcutKey = shortcutKey.toLowerCase();
-
     function handleKeyDown(event: KeyboardEvent) {
       if (
         event.defaultPrevented ||
         event.altKey ||
         event.ctrlKey ||
         event.metaKey ||
-        event.key.toLowerCase() !== normalizedShortcutKey ||
-        isEditableElement(event.target)
+        event.key.toLowerCase() !== shortcutKey ||
+        (shortcutKey !== "escape" && isEditableElement(event.target))
       ) {
         return;
       }
@@ -56,45 +60,46 @@ export function Action(props: ActionProps) {
         return;
       }
 
-      onClick?.();
+      onPress?.();
     }
 
     window.addEventListener("keydown", handleKeyDown);
 
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [href, onClick, shortcutKey]);
+  }, [href, onPress, shortcutKey]);
+
+  const content = (
+    <>
+      {props.label}
+      <ActionShortcutKey>{shortcutLabel}</ActionShortcutKey>
+    </>
+  );
 
   if ("href" in props) {
     return (
       <a
-        className={ACTION_CONTROL_CLASS_NAME}
+        className={ACTION_CLASS_NAME}
         href={props.href}
         rel="noreferrer"
         target="_blank"
-        aria-keyshortcuts={shortcutLabel}
+        aria-keyshortcuts={props.shortcutKey}
       >
-        {props.label}
-        {shortcutLabel ? (
-          <ActionShortcutKey>{shortcutLabel}</ActionShortcutKey>
-        ) : null}
+        {content}
       </a>
     );
   }
 
   return (
-    <div className="flex flex-col items-end">
-      {props.isOpen ? (
-        <ActionMenu id={props.menuId}>{props.children}</ActionMenu>
-      ) : null}
-      <ActionButton
-        controls={props.menuId}
-        isOpen={props.isOpen}
-        shortcutKey={props.shortcutKey}
-        onClick={props.onClick}
-      >
-        {props.label}
-      </ActionButton>
-    </div>
+    <button
+      type="button"
+      className={ACTION_CLASS_NAME}
+      aria-controls={props.controls}
+      aria-expanded={props.isOpen}
+      aria-keyshortcuts={props.shortcutKey}
+      onClick={props.onPress}
+    >
+      {content}
+    </button>
   );
 }
 

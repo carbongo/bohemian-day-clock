@@ -8,6 +8,7 @@
     "start": "parcel src/index.html --port 8000",
     "build": "parcel build src/index.html --dist-dir public --public-url ./ --no-source-maps && node scripts/inline-output.mjs public/index.html",
     "typecheck": "tsc --noEmit",
+    "icons": "node scripts/icons.mjs",
     "desktop:package": "node scripts/desktop.mjs",
     "desktop": "npm run build && npm run desktop:package"
   },

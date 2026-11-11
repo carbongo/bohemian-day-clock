@@ -13,13 +13,22 @@ export const PLASTER_RING_INNER_RADIUS =
 export const PLASTER_RING_OUTER_RADIUS =
   SUN_ARC_RADIUS + PLASTER_RING_WIDTH / 2;
 
+export const TRACK_WIDTH = 30;
+export const TRACK_OUTER_RADIUS = PLASTER_RING_INNER_RADIUS;
+export const TRACK_INNER_RADIUS = TRACK_OUTER_RADIUS - TRACK_WIDTH;
+export const TRACK_RADIUS = TRACK_OUTER_RADIUS - TRACK_WIDTH / 2;
+export const FACE_RADIUS = TRACK_INNER_RADIUS;
+
 export function minutesToDegrees(minutes: number) {
   return (
     (normalizeMinutes(minutes + MINUTES_PER_DAY / 2) / MINUTES_PER_DAY) * 360
   );
 }
 
-export function polarToCartesian(angleDegrees: number, radius = SUN_ARC_RADIUS) {
+export function polarToCartesian(
+  angleDegrees: number,
+  radius = SUN_ARC_RADIUS,
+) {
   const angleRadians = ((angleDegrees - 90) * Math.PI) / 180;
 
   return {
@@ -71,7 +80,15 @@ export function getRoundedSunEventHours(
 
 function getRoundedHour(minutes: number) {
   return (
-    normalizeMinutes(Math.round(minutes / MINUTES_PER_HOUR) * MINUTES_PER_HOUR) /
-    MINUTES_PER_HOUR
+    normalizeMinutes(
+      Math.round(minutes / MINUTES_PER_HOUR) * MINUTES_PER_HOUR,
+    ) / MINUTES_PER_HOUR
   );
+}
+
+/** A repeatable pseudo-random number in [0, 1) for drawn texture. */
+export function seededUnit(index: number, salt: number) {
+  const value = Math.sin((index + 1) * 12.9898 + salt * 78.233) * 43758.5453;
+
+  return value - Math.floor(value);
 }

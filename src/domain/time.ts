@@ -20,6 +20,63 @@ export function getClockTime(date: Date, timeZone?: string): ClockTime {
   };
 }
 
+export interface ZonedDate {
+  year: number;
+  month: number;
+  day: number;
+  /** 0 Sunday to 6 Saturday. */
+  weekday: number;
+}
+
+const WEEKDAY_INDEX: Record<string, number> = {
+  Sun: 0,
+  Mon: 1,
+  Tue: 2,
+  Wed: 3,
+  Thu: 4,
+  Fri: 5,
+  Sat: 6,
+};
+
+export function getZonedDate(date: Date, timeZone: string): ZonedDate {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    day: "numeric",
+    month: "numeric",
+    timeZone,
+    weekday: "short",
+    year: "numeric",
+  }).formatToParts(date);
+
+  return {
+    year: Number(getDateTimePart(parts, "year")),
+    month: Number(getDateTimePart(parts, "month")),
+    day: Number(getDateTimePart(parts, "day")),
+    weekday: WEEKDAY_INDEX[getDateTimePart(parts, "weekday")] ?? 0,
+  };
+}
+
+export function getMinutesOfDay({ hours, minutes }: ClockTime) {
+  return hours * MINUTES_PER_HOUR + minutes;
+}
+
+/** "45 min", "1 hour", "2 hours 5 min". */
+export function formatDuration(totalMinutes: number) {
+  const hours = Math.floor(totalMinutes / MINUTES_PER_HOUR);
+  const minutes = totalMinutes % MINUTES_PER_HOUR;
+  const hourLabel = hours === 1 ? "1 hour" : `${hours} hours`;
+
+  if (hours === 0) return `${minutes} min`;
+  if (minutes === 0) return hourLabel;
+
+  return `${hourLabel} ${minutes} min`;
+}
+
+export function formatMinutesOfDay(minutes: number) {
+  const normalized = normalizeMinutes(Math.round(minutes));
+
+  return `${formatTimePart(Math.floor(normalized / MINUTES_PER_HOUR))}:${formatTimePart(normalized % MINUTES_PER_HOUR)}`;
+}
+
 export function getClockRotationDegrees({ hours, minutes }: ClockTime) {
   return 180 - (hours * MINUTES_PER_HOUR + minutes) * 0.25;
 }

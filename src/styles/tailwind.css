@@ -1,1 +1,65 @@
 @import "tailwindcss";
+
+@font-face {
+  font-family: "Dial Text";
+  font-weight: 400;
+  font-display: block;
+  src: url("data-url:../assets/fonts/dial-text-regular.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Dial Text";
+  font-weight: 700;
+  font-display: block;
+  src: url("data-url:../assets/fonts/dial-text-bold.woff2") format("woff2");
+}
+
+@theme {
+  --font-dial:
+    "Dial Text", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --color-ink: #2a1c0e;
+  --color-rubric: #8a1c12;
+  --color-gilt: #d9b24a;
+  --color-vellum: #f3e6c0;
+}
+
+:root {
+  /* One hundredth of the dial's side: every dial text size is a multiple. */
+  --u: min(1vw, 1vh);
+}
+
+@utility parchment {
+  color: var(--color-ink);
+  background-color: #e6d5a8;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.035' numOctaves='4' seed='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .42 0 0 0 0 .27 0 0 0 0 .1 0 0 0 -.9 .55'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)'/%3E%3C/svg%3E"),
+    radial-gradient(ellipse at 30% 15%, #f6ebc9 0%, #e7d6a9 55%, #cdb47e 100%);
+  border: 1px solid #4a3212;
+  box-shadow:
+    0 0 0 3px #b8963e,
+    0 0 0 4px #3d2a10,
+    0 18px 50px rgb(0 0 0 / 0.75),
+    inset 0 0 36px rgb(110 70 25 / 0.4);
+}
+
+@utility gilt-text {
+  color: var(--color-gilt);
+  background-image: linear-gradient(
+    180deg,
+    #fff3b0 0%,
+    #ecc75a 45%,
+    #b98a26 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: none;
+  filter: drop-shadow(
+    0 calc(var(--u) * 0.25) calc(var(--u) * 0.3) rgb(0 0 0 / 0.55)
+  );
+}
+
+@utility ink-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #7a5a2a transparent;
+}
