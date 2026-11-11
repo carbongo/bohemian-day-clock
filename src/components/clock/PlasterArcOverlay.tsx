@@ -3,6 +3,9 @@ import {
   PLASTER_RING_CLIP_PATH,
   PLASTER_RING_INNER_RADIUS,
   PLASTER_RING_OUTER_RADIUS,
+  TRACK_INNER_RADIUS,
+  polarToCartesian,
+  seededUnit,
 } from "./lib/clockGeometry";
 import { ClockSvg } from "./lib/clockSvgDefs";
 
@@ -54,6 +57,46 @@ const hairlineCracks = [
   "M376 237l15 16 20-9 16 16",
 ];
 
+const FINE_CRACK_COUNT = 64;
+const fineCracks = Array.from({ length: FINE_CRACK_COUNT }, (_, index) =>
+  getFineCrackPath(index),
+);
+
+/** A crack wandering in from one edge of the ring, sometimes forking. */
+function getFineCrackPath(index: number) {
+  const fromOuter = seededUnit(index, 3) > 0.45;
+  const reach = 0.35 + seededUnit(index, 5) * 0.75;
+  const steps = 5;
+  const width = PLASTER_RING_OUTER_RADIUS - PLASTER_RING_INNER_RADIUS;
+  let angle =
+    (index / FINE_CRACK_COUNT) * 360 + (seededUnit(index, 7) - 0.5) * 6;
+  const points: string[] = [];
+  let fork = "";
+
+  for (let step = 0; step <= steps; step += 1) {
+    const travelled = (step / steps) * reach * width;
+    const radius = fromOuter
+      ? PLASTER_RING_OUTER_RADIUS - travelled
+      : PLASTER_RING_INNER_RADIUS + travelled;
+    const point = polarToCartesian(angle, radius);
+
+    points.push(`${point.x.toFixed(1)} ${point.y.toFixed(1)}`);
+
+    if (step === 2 && seededUnit(index, 11) > 0.5) {
+      const end = polarToCartesian(
+        angle + (seededUnit(index, 13) - 0.5) * 9,
+        radius + (fromOuter ? -1 : 1) * width * 0.22,
+      );
+
+      fork = ` M ${point.x.toFixed(1)} ${point.y.toFixed(1)} L ${end.x.toFixed(1)} ${end.y.toFixed(1)}`;
+    }
+
+    angle += (seededUnit(index * 9 + step, 17) - 0.5) * 2.6;
+  }
+
+  return `M ${points.join(" L ")}${fork}`;
+}
+
 export function PlasterArcOverlay() {
   return (
     <ClockSvg id="plaster-arc-overlay-svg">
@@ -69,6 +112,30 @@ export function PlasterArcOverlay() {
           <stop offset="0.48" stopColor="#ffffff" stopOpacity="0" />
           <stop offset="1" stopColor="#4a4f60" stopOpacity="0.12" />
         </linearGradient>
+
+        {/* Blotches of damp and age in the plaster. */}
+        <filter id="plaster-stain" x="0" y="0" width="100%" height="100%">
+          <feTurbulence
+            type="fractalNoise"
+            baseFrequency="0.011"
+            numOctaves="4"
+            seed="8"
+          />
+          <feColorMatrix values="0 0 0 0 0.47  0 0 0 0 0.45  0 0 0 0 0.4  0 0 0 -1.9 0.95" />
+          <feComposite in2="SourceGraphic" operator="in" />
+        </filter>
+
+        {/* The grit of the plaster itself. */}
+        <filter id="plaster-grain" x="0" y="0" width="100%" height="100%">
+          <feTurbulence
+            type="fractalNoise"
+            baseFrequency="0.85"
+            numOctaves="2"
+            seed="2"
+          />
+          <feColorMatrix values="0 0 0 0 0.3  0 0 0 0 0.28  0 0 0 0 0.24  0 0 0 -1.2 0.62" />
+          <feComposite in2="SourceGraphic" operator="in" />
+        </filter>
 
         <clipPath id="plaster-ring-clip">
           <path
@@ -89,15 +156,28 @@ export function PlasterArcOverlay() {
         fill="url(#plaster-shade)"
         fillRule="evenodd"
       />
+      <path
+        d={PLASTER_RING_CLIP_PATH}
+        fillRule="evenodd"
+        filter="url(#plaster-stain)"
+      />
+      <path
+        d={PLASTER_RING_CLIP_PATH}
+        fillRule="evenodd"
+        filter="url(#plaster-grain)"
+      />
 
       <g clipPath="url(#plaster-ring-clip)">
         <g
           fill="none"
-          stroke="#756d5c"
+          stroke="#5d5a5c"
           strokeLinecap="round"
           strokeLinejoin="round"
-          strokeOpacity="0.25"
+          strokeOpacity="0.55"
         >
+          {fineCracks.map((path) => (
+            <path key={path} d={path} strokeWidth="1.1" />
+          ))}
           {crackPaths.map((path) => (
             <path key={path} d={path} strokeWidth="1.7" />
           ))}
@@ -196,6 +276,20 @@ export function PlasterArcBorders() {
           r={PLASTER_RING_INNER_RADIUS + 2}
           stroke="url(#gold-inner-border)"
           strokeWidth="6"
+        />
+        <circle
+          cx={CLOCK_CENTER}
+          cy={CLOCK_CENTER}
+          r={TRACK_INNER_RADIUS}
+          stroke="#68480f"
+          strokeWidth="9"
+        />
+        <circle
+          cx={CLOCK_CENTER}
+          cy={CLOCK_CENTER}
+          r={TRACK_INNER_RADIUS + 1.5}
+          stroke="#e9c552"
+          strokeWidth="4"
         />
       </g>
     </ClockSvg>

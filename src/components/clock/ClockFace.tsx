@@ -2,12 +2,11 @@ import { useId } from "react";
 
 import {
   CLOCK_CENTER,
-  PLASTER_RING_INNER_RADIUS,
+  FACE_RADIUS,
   PLASTER_RING_OUTER_RADIUS,
 } from "./lib/clockGeometry";
 import { ClockSvg } from "./lib/clockSvgDefs";
 
-const FACE_RADIUS = PLASTER_RING_INNER_RADIUS + 8;
 const FACE_BACKDROP_RADIUS = PLASTER_RING_OUTER_RADIUS;
 
 const scratchPaths = [
@@ -70,6 +69,9 @@ export function ClockFace() {
   const faceClipPathId = `${svgId}-face-clip`;
   const faceFillId = `${svgId}-face-fill`;
   const faceShadeId = `${svgId}-face-shade`;
+  const faceGrainId = `${svgId}-face-grain`;
+  const faceMottleId = `${svgId}-face-mottle`;
+  const dialShadowId = `${svgId}-dial-shadow`;
 
   return (
     <ClockSvg id="clock-face-svg" className="z-10">
@@ -78,26 +80,62 @@ export function ClockFace() {
           <circle cx={CLOCK_CENTER} cy={CLOCK_CENTER} r={FACE_RADIUS} />
         </clipPath>
 
-        <radialGradient id={faceFillId} cx="54%" cy="48%" r="58%">
-          <stop offset="0" stopColor="#3a3025" />
-          <stop offset="0.4" stopColor="#29231c" />
-          <stop offset="0.78" stopColor="#171513" />
-          <stop offset="1" stopColor="#060606" />
+        <radialGradient id={faceFillId} cx="50%" cy="44%" r="60%">
+          <stop offset="0" stopColor="#7a5230" />
+          <stop offset="0.45" stopColor="#5f3d20" />
+          <stop offset="0.8" stopColor="#3f2713" />
+          <stop offset="1" stopColor="#24150a" />
         </radialGradient>
 
-        <radialGradient id={faceShadeId} cx="50%" cy="46%" r="51%">
-          <stop offset="0" stopColor="#887b68" stopOpacity="0.18" />
-          <stop offset="0.43" stopColor="#3b342b" stopOpacity="0.08" />
-          <stop offset="0.82" stopColor="#000000" stopOpacity="0.44" />
-          <stop offset="1" stopColor="#000000" stopOpacity="0.86" />
+        <radialGradient id={faceShadeId} cx="50%" cy="50%" r="50%">
+          <stop offset="0" stopColor="#c99b62" stopOpacity="0.14" />
+          <stop offset="0.6" stopColor="#2a1a0c" stopOpacity="0" />
+          <stop offset="0.9" stopColor="#0d0703" stopOpacity="0.5" />
+          <stop offset="1" stopColor="#000000" stopOpacity="0.9" />
         </radialGradient>
+
+        {/* Fine streaks, like brushed wood. */}
+        <filter id={faceGrainId} x="0" y="0" width="100%" height="100%">
+          <feTurbulence
+            type="fractalNoise"
+            baseFrequency="0.018 0.42"
+            numOctaves="3"
+            seed="11"
+          />
+          <feColorMatrix values="0 0 0 0 0.09  0 0 0 0 0.05  0 0 0 0 0.02  0 0 0 -1.7 0.92" />
+          <feComposite in2="SourceGraphic" operator="in" />
+        </filter>
+
+        {/* Large stains, like handled leather. */}
+        <filter id={faceMottleId} x="0" y="0" width="100%" height="100%">
+          <feTurbulence
+            type="fractalNoise"
+            baseFrequency="0.0075"
+            numOctaves="4"
+            seed="3"
+          />
+          <feColorMatrix values="0 0 0 0 0.06  0 0 0 0 0.03  0 0 0 0 0.01  0 0 0 -2.6 1.5" />
+          <feComposite in2="SourceGraphic" operator="in" />
+        </filter>
+
+        <filter id={dialShadowId} x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="16" />
+        </filter>
       </defs>
 
       <circle
         cx={CLOCK_CENTER}
+        cy={CLOCK_CENTER + 12}
+        r={FACE_BACKDROP_RADIUS + 4}
+        fill="#000000"
+        opacity="0.75"
+        filter={`url(#${dialShadowId})`}
+      />
+      <circle
+        cx={CLOCK_CENTER}
         cy={CLOCK_CENTER}
         r={FACE_BACKDROP_RADIUS}
-        fill={`url(#${faceFillId})`}
+        fill="#1b120a"
       />
 
       <g clipPath={`url(#${faceClipPathId})`}>
@@ -111,7 +149,13 @@ export function ClockFace() {
           cx={CLOCK_CENTER}
           cy={CLOCK_CENTER}
           r={FACE_RADIUS}
-          fill={`url(#${faceShadeId})`}
+          filter={`url(#${faceMottleId})`}
+        />
+        <circle
+          cx={CLOCK_CENTER}
+          cy={CLOCK_CENTER}
+          r={FACE_RADIUS}
+          filter={`url(#${faceGrainId})`}
         />
 
         <g
@@ -120,14 +164,14 @@ export function ClockFace() {
           strokeLinejoin="round"
           transform="rotate(-7 600 600)"
         >
-          <g stroke="#080706" strokeOpacity="0.26" strokeWidth="1.4">
+          <g stroke="#150c05" strokeOpacity="0.3" strokeWidth="1.4">
             {scratchPaths.map((path) => (
               <path key={path} d={path} />
             ))}
           </g>
           <g
-            stroke="#a39378"
-            strokeOpacity="0.055"
+            stroke="#d9b98a"
+            strokeOpacity="0.07"
             strokeWidth="0.8"
             transform="translate(-2 -2)"
           >
@@ -153,6 +197,13 @@ export function ClockFace() {
             />
           ))}
         </g>
+
+        <circle
+          cx={CLOCK_CENTER}
+          cy={CLOCK_CENTER}
+          r={FACE_RADIUS}
+          fill={`url(#${faceShadeId})`}
+        />
       </g>
     </ClockSvg>
   );

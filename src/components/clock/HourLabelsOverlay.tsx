@@ -12,19 +12,25 @@ import {
 import { ClockSvg } from "./lib/clockSvgDefs";
 
 const HOURS = Array.from({ length: HOURS_PER_DAY }, (_, hour) => hour);
-const textClassName =
-  "font-serif text-[36px] font-bold [paint-order:stroke]";
-const dayTextClassName = `${textClassName} fill-black/80`;
+const textClassName = "font-dial text-[46px] font-bold";
+const dayTextClassName = `${textClassName} fill-[#1b140d]`;
 const nightTextClassName = `${textClassName} fill-white`;
 const sunEventTextClassName = `${textClassName} fill-amber-200`;
-const moonHourTextClassName = `${textClassName} fill-black`;
-const sunHourTextClassName = `${textClassName} fill-black`;
+const moonHourTextClassName = `${textClassName} fill-[#1b140d]`;
+const sunHourTextClassName = `${textClassName} fill-[#2a1503]`;
+
+const litMoonHourTextClassName = `${textClassName} fill-[#f3ecd8]`;
 
 interface HourLabelsOverlayProps {
+  /** True when the moon at 24 is mostly dark, so its numeral must be light. */
+  moonIsDark: boolean;
   sunWindow: SunWindow;
 }
 
-export function HourLabelsOverlay({ sunWindow }: HourLabelsOverlayProps) {
+export function HourLabelsOverlay({
+  moonIsDark,
+  sunWindow,
+}: HourLabelsOverlayProps) {
   const sunEventHours =
     sunWindow.status === "normal"
       ? getRoundedSunEventHours(
@@ -42,11 +48,15 @@ export function HourLabelsOverlay({ sunWindow }: HourLabelsOverlayProps) {
         return (
           <text
             key={hour}
-            className={getHourTextClassName(sunWindow, sunEventHours, hour)}
+            className={
+              hour === 0 && moonIsDark
+                ? litMoonHourTextClassName
+                : getHourTextClassName(sunWindow, sunEventHours, hour)
+            }
             x={position.x}
             y={position.y}
             textAnchor="middle"
-            dominantBaseline="middle"
+            dominantBaseline="central"
             transform={`rotate(${angle} ${position.x} ${position.y})`}
           >
             {hour === 0 ? "24" : hour}

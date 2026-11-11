@@ -12,6 +12,7 @@ import {
   getRingClipPath,
   minutesToDegrees,
   polarToCartesian,
+  seededUnit,
 } from "./lib/clockGeometry";
 import {
   ClockSvg,
@@ -24,6 +25,8 @@ interface NightOverlayProps {
   sunWindow: SunWindow;
 }
 
+const twilightClassName =
+  "fill-none stroke-sky-200/55 stroke-[190] [stroke-linecap:round]";
 const nightOuterGlowClassName =
   "fill-none stroke-sky-600/70 stroke-[190] [stroke-linecap:round]";
 const nightMidGlowClassName =
@@ -35,6 +38,7 @@ const NIGHT_STAR_INNER_RADIUS = PLASTER_RING_INNER_RADIUS + 18;
 const NIGHT_STAR_OUTER_RADIUS = PLASTER_RING_OUTER_RADIUS - 18;
 const NIGHT_STAR_CLIP_INNER_RADIUS = PLASTER_RING_INNER_RADIUS;
 const NIGHT_STAR_CLIP_OUTER_RADIUS = PLASTER_RING_OUTER_RADIUS;
+const TWILIGHT_MINUTES = 70;
 const NIGHT_MID_GLOW_ARC_RATIO = 0.88;
 const NIGHT_CORE_ARC_RATIO = 0.5;
 
@@ -80,6 +84,14 @@ export function NightOverlay({ sunWindow }: NightOverlayProps) {
     sunWindow.sunsetMinutes,
     sunWindow.sunriseMinutes,
   );
+  const dayDuration = normalizeMinutes(
+    sunWindow.sunsetMinutes - sunWindow.sunriseMinutes,
+  );
+  const twilightMinutes = Math.min(TWILIGHT_MINUTES, dayDuration / 4);
+  const twilightPath = getClockArcPath(
+    sunWindow.sunsetMinutes - twilightMinutes,
+    sunWindow.sunriseMinutes + twilightMinutes,
+  );
   const nightMidPath = getNightCenteredArcPath(
     sunWindow.sunsetMinutes,
     sunWindow.sunriseMinutes,
@@ -100,6 +112,7 @@ export function NightOverlay({ sunWindow }: NightOverlayProps) {
         corePath={nightCorePath}
         midPath={nightMidPath}
         path={nightPath}
+        twilightPath={twilightPath}
         ringClipPathId={nightArcClipPathId}
         softGlowFilterId={softGlowFilterId}
       />
@@ -121,6 +134,7 @@ interface NightArcProps {
   corePath?: string;
   midPath?: string;
   path?: string;
+  twilightPath?: string;
   ringClipPathId: string;
   softGlowFilterId: string;
 }
@@ -129,6 +143,7 @@ function NightArc({
   corePath,
   midPath,
   path,
+  twilightPath,
   ringClipPathId,
   softGlowFilterId,
 }: NightArcProps) {
@@ -176,6 +191,9 @@ function NightArc({
       </defs>
       <g clipPath={`url(#${ringClipPathId})`}>
         <g filter={`url(#${softGlowFilterId})`}>
+          {twilightPath ? (
+            <path className={twilightClassName} d={twilightPath} />
+          ) : null}
           {glowShapes}
           {coreShape}
         </g>
@@ -374,12 +392,6 @@ function getNightCenteredArcPath(
     midnightMinutes - arcMinutes / 2,
     midnightMinutes + arcMinutes / 2,
   );
-}
-
-function seededUnit(index: number, salt: number) {
-  const value = Math.sin((index + 1) * 12.9898 + salt * 78.233) * 43758.5453;
-
-  return value - Math.floor(value);
 }
 
 function lerp(start: number, end: number, amount: number) {

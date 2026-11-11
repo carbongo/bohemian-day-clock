@@ -9,7 +9,8 @@
 | Windows | `…_windows-x64.msi`                            | `assets/icon.ico`  |
 | Linux   | `…_linux-amd64.deb`, `…_linux-x86_64.AppImage` | `assets/icon.png`  |
 
-- Icons and `assets/social-preview.png` are renders of the dial itself (headless Chrome, round mask).
+- Icons come from `assets/icon.svg` through `npm run icons`; `assets/social-preview.png` is a 1280 × 640 headless-Chrome capture of the page.
+- Widget: `W` or a window side under 380 px. Always on top is Pake's Window → Toggle Always on Top; the page cannot set it.
 
 ## Release
 
